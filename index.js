@@ -11,7 +11,7 @@ dotenv.config();
 const app = express();
 
 // ✅ Middleware setup
-app.use(helmet());
+// app.use(helmet());
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -21,11 +21,8 @@ if (process.env.NODE_ENV !== 'test') {
 }
 
 // ✅ MongoDB connection
-mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/cineseat', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => console.log('✅ MongoDB connected'))
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/cineseat')
+.then(() => console.log('✅ MongoDB connected', process.env.MONGODB_URI))
 .catch(err => console.error('❌ MongoDB connection error:', err));
 
 // ✅ Import routes
