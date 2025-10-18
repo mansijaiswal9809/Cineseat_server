@@ -1,4 +1,4 @@
-function authenticate(req, res, next) {
+export default function authenticate(req, res, next) {
     const authHeader = req.get('Authorization') || '';
     const tokenFromHeader = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
     const token = tokenFromHeader || req.cookies && req.cookies.token;

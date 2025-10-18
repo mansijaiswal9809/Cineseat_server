@@ -1,6 +1,7 @@
 import express from 'express';
 import MovieBooking from '../models/movieBooking.js';
-import Movie from '../models/Movie.js';
+import Movie from '../models/movies.js';
+import authenticate from '../middleware.js';
 
 const router = express.Router();
 
