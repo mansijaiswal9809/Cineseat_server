@@ -7,7 +7,7 @@ import  authenticate  from '../middleware.js';
 const router = express.Router();
 
 
-const JWT_SECRET = process.env.JWT_SECRET || 'replace_this_secret';
+const JWT_SECRET = process.env.JWT_SECRET || 'your_secret_key_here';
 const JWT_EXPIRES_IN = '7d';
 
 
@@ -26,7 +26,7 @@ router.post('/register', async (req, res) => {
         await user.save();
 
         const token = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
-        res.cookie('token', token, { httpOnly: true, sameSite: 'lax' });
+        res.cookie('token', token, { httpOnly: true, sameSite: 'lax', secure:false });
         res.status(201).json({ token, user: { id: user._id, email: user.email, name: user.name } });
     } catch (err) {
         res.status(500).json({ error: 'Server error' });
@@ -46,7 +46,7 @@ router.post('/login', async (req, res) => {
         if (!ok) return res.status(401).json({ error: 'Invalid credentials' });
 
         const token = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
-        res.cookie('token', token, { httpOnly: true, sameSite: 'lax' });
+        res.cookie('token', token, { httpOnly: true, sameSite: 'lax', secure:false });
         res.json({ token, user: { id: user._id, email: user.email, name: user.name } });
     } catch (err) {
         res.status(500).json({ error: 'Server error' });
@@ -58,7 +58,7 @@ router.get('/me', authenticate, async (req, res) => {
     try {
         const user = await User.findById(req.user.id).select('-password');
         if (!user) return res.status(404).json({ error: 'User not found' });
-        res.json({ user });
+        res.status(200).json({ user });
     } catch (err) {
         res.status(500).json({ error: 'Server error' });
     }

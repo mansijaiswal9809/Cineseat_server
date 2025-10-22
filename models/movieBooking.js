@@ -13,12 +13,12 @@ const movieBookingSchema = new mongoose.Schema({
         required: true
     },
     showTime: {
-        type: Date,
+        type: String,
         required: true
     },
     seats: [{
         row: String,
-        number: Number
+        num: Number
     }],
     totalAmount: {
         type: Number,
@@ -30,8 +30,8 @@ const movieBookingSchema = new mongoose.Schema({
         default: 'pending'
     },
     bookingDate: {
-        type: Date,
-        default: Date.now
+        type: String,
+        required: true
     }
 }, { timestamps: true });
 

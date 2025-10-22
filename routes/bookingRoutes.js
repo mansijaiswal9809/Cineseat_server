@@ -19,17 +19,66 @@ router.get('/', async (req, res) => {
 /* 
 📌 2. GET booking by ID
 */
-router.get('/:id', async (req, res) => {
-    try {
-        const booking = await MovieBooking.findById(req.params.id)
-            .populate('userId', 'name email')
-            .populate('movieId', 'title genre');
-        if (!booking) return res.status(404).json({ message: 'Booking not found' });
-        res.status(200).json(booking);
-    } catch (error) {
-        res.status(500).json({ message: 'Failed to fetch booking', error });
+// router.get('/:id', async (req, res) => {
+//     try {
+//         const booking = await MovieBooking.findById(req.params.id)
+//             .populate('userId', 'name email')
+//             .populate('movieId', 'title genre');
+//         if (!booking) return res.status(404).json({ message: 'Booking not found' });
+//         res.status(200).json(booking);
+//     } catch (error) {
+//         res.status(500).json({ message: 'Failed to fetch booking', error });
+//     }
+// });
+
+// routes/bookingRoutes.js
+
+// Fetch booked seats for a movie, date, and showtime
+router.get("/booked-seats", async (req, res) => {
+  try {
+    let { movieId, date, showTime } = req.query;
+
+    console.log("Incoming query:", { movieId, date, showTime });
+
+    // ✅ 1. Validate required fields
+    if (!movieId || !date || !showTime) {
+      return res.status(400).json({ message: "Missing required fields (movieId, date, showTime)" });
     }
+
+   
+
+
+    // ✅ 4. Query confirmed bookings
+    // const bookings = await MovieBooking.find({
+    //   movieId: "68f434e1b99bb8b44793e030",
+    //   bookingDate: "20 Oct",
+    //   showTime: "11:00 AM",
+    //   bookingStatus: "confirmed",
+    // });
+    const bookings = await MovieBooking.find({
+      movieId,
+      bookingDate: date,
+      showTime,
+      bookingStatus: "confirmed",
+    });
+
+    console.log("Bookings found:", bookings);
+
+    // ✅ 5. Collect booked seats safely
+    const bookedSeats = bookings.flatMap((booking) =>
+      booking.seats.map((seat) => `${seat.row}${seat.num}`)
+    );
+
+    console.log("Booked seats:", bookedSeats);
+
+    res.status(200).json({ bookedSeats });
+  } catch (error) {
+    console.error("Booking error:", error);
+    res.status(500).json({ message: "Failed to fetch booked seats", error });
+  }
 });
+
+
 
 /* 
 📌 3. POST create a new booking
@@ -42,34 +91,29 @@ router.get('/:id', async (req, res) => {
         "totalAmount": 400
     }
 */
-router.post('/', authenticate, async (req, res) => {
-    try {
-        const { userId, movieId, showTime, seats, totalAmount } = req.body;
+router.post("/create", authenticate, async (req, res) => {
+  try {
+    const { movieId, showTime, seats, totalAmount, bookingDate } = req.body;
 
-        if (!userId || !movieId || !showTime || !seats || !totalAmount) {
-            return res.status(400).json({ message: 'All required fields must be provided' });
-        }
-
-        // Check if movie exists
-        const movie = await Movie.findById(movieId);
-        if (!movie) {
-            return res.status(404).json({ message: 'Movie not found' });
-        }
-
-        const newBooking = new MovieBooking({
-            userId,
-            movieId,
-            showTime,
-            seats,
-            totalAmount,
-            bookingStatus: 'confirmed'
-        });
-
-        const savedBooking = await newBooking.save();
-        res.status(201).json({ message: 'Booking created successfully', booking: savedBooking });
-    } catch (error) {
-        res.status(500).json({ message: 'Failed to create booking', error });
+    if (!movieId || !showTime || !seats?.length || !totalAmount || !bookingDate) {
+      return res.status(400).json({ message: "Missing required booking details" });
     }
+
+    const booking = await MovieBooking.create({
+      userId: req.user.id,
+      movieId,
+      showTime,
+      seats,
+      totalAmount,
+      bookingDate,
+      bookingStatus: "confirmed",
+    });
+
+    res.status(201).json({ success: true, booking });
+  } catch (error) {
+    console.error("Error creating booking:", error);
+    res.status(500).json({ message: "Failed to create booking" });
+  }
 });
 
 /* 
