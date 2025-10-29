@@ -62,14 +62,14 @@ router.get("/booked-seats", async (req, res) => {
       bookingStatus: "confirmed",
     });
 
-    console.log("Bookings found:", bookings);
+    // console.log("Bookings found:", bookings);
 
     // ✅ 5. Collect booked seats safely
     const bookedSeats = bookings.flatMap((booking) =>
       booking.seats.map((seat) => `${seat.row}${seat.num}`)
     );
 
-    console.log("Booked seats:", bookedSeats);
+    // console.log("Booked seats:", bookedSeats);
 
     res.status(200).json({ bookedSeats });
   } catch (error) {
