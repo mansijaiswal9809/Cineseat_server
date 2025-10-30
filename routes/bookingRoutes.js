@@ -40,7 +40,7 @@ router.get("/booked-seats", async (req, res) => {
 
     console.log("Incoming query:", { movieId, date, showTime });
 
-    // ✅ 1. Validate required fields
+    //  1. Validate required fields
     if (!movieId || !date || !showTime) {
       return res.status(400).json({ message: "Missing required fields (movieId, date, showTime)" });
     }
@@ -48,7 +48,7 @@ router.get("/booked-seats", async (req, res) => {
    
 
 
-    // ✅ 4. Query confirmed bookings
+    //  4. Query confirmed bookings
     // const bookings = await MovieBooking.find({
     //   movieId: "68f434e1b99bb8b44793e030",
     //   bookingDate: "20 Oct",
@@ -64,7 +64,7 @@ router.get("/booked-seats", async (req, res) => {
 
     // console.log("Bookings found:", bookings);
 
-    // ✅ 5. Collect booked seats safely
+    //  5. Collect booked seats safely
     const bookedSeats = bookings.flatMap((booking) =>
       booking.seats.map((seat) => `${seat.row}${seat.num}`)
     );

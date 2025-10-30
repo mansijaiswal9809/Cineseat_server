@@ -7,7 +7,7 @@ import  authenticate  from '../middleware.js';
 const router = express.Router();
 
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your_secret_key_here';
+const JWT_SECRET = process.env.JWT_SECRET || 'SECRET';
 const JWT_EXPIRES_IN = '7d';
 
 

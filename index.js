@@ -5,20 +5,18 @@ import helmet from 'helmet';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 
-// ✅ Load environment variables
+
 dotenv.config();
 
 const app = express();
 
-// ✅ Middleware setup
-// app.use(helmet());
-// app.use(cors());
+
 const FRONTEND_URL = 'http://localhost:5173';
 
 app.use(
   cors({
     origin: FRONTEND_URL,
-    credentials: true, // Allow cookies
+    credentials: true, 
   })
 )
 app.use(express.json());
@@ -31,29 +29,24 @@ if (process.env.NODE_ENV !== 'test') {
   app.use(morgan('dev'));
 }
 
-// ✅ MongoDB connection
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/cineseat')
-.then(() => console.log('✅ MongoDB connected', process.env.MONGODB_URI))
-.catch(err => console.error('❌ MongoDB connection error:', err));
+.then(() => console.log('MongoDB connected', process.env.MONGODB_URI))
+.catch(err => console.error('MongoDB connection error:', err));
 
-// ✅ Import routes
 import movieRoutes from './routes/movieRoutes.js';
 import bookingRoutes from './routes/bookingRoutes.js';
-import authRouter from './routes/auth.js'; // keep your auth routes
+import authRouter from './routes/auth.js'; 
 
-// ✅ API route prefix
 const api = express.Router();
 api.use('/auth', authRouter);
 api.use('/movies', movieRoutes);
 api.use('/bookings', bookingRoutes);
 app.use('/api', api);
 
-// ✅ 404 handler
 app.use((req, res) => {
   res.status(404).json({ error: 'Not Found' });
 });
 
-// ✅ Global error handler
 app.use((err, req, res, next) => {
   console.error(err);
   res.status(err.status || 500).json({
@@ -61,14 +54,12 @@ app.use((err, req, res, next) => {
   });
 });
 
-// ✅ Start server
 const PORT = parseInt(process.env.PORT, 10) || 3000;
 
 const server = app.listen(PORT, () => {
   console.log(`🚀 CineSeat server running on port ${PORT} (${process.env.NODE_ENV || 'development'})`);
 });
 
-// ✅ Graceful shutdown
 const shutdown = (signal) => {
   console.log(`🛑 Received ${signal}. Shutting down...`);
   server.close(() => {
@@ -76,7 +67,6 @@ const shutdown = (signal) => {
     process.exit(0);
   });
 
-  // Force close after 10 seconds
   setTimeout(() => {
     console.error('Force shutdown after 10s.');
     process.exit(1);
@@ -86,5 +76,4 @@ const shutdown = (signal) => {
 process.on('SIGINT', () => shutdown('SIGINT'));
 process.on('SIGTERM', () => shutdown('SIGTERM'));
 
-// ✅ Export for testing
 export default app;
